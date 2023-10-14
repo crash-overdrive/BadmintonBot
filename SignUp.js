@@ -29,8 +29,8 @@ class SignUpList {
     const sender = await message.getContact();
     const timestamp = message.timestamp;
 
-    if (!this.signUpList.some(e => e.sender.id.user === sender.id.user)) {
-      this.signUpList.push({sender, timestamp});
+    if (!this.signUpList.some(e => e.author === message.author)) {
+      this.signUpList.push({author: message.author, timestamp});
       await message.react("✅");
     } else {
       await message.react("❌");
@@ -42,7 +42,7 @@ class SignUpList {
     const sender = await message.getContact();
     const timestamp = message.timestamp;
 
-    if (!this.paidList.some(e => e.sender.id.user === sender.id.user)) {
+    if (!this.paidList.some(e => e.sender.id.user === message.author)) {
       this.paidList.push({sender, timestamp});
       await message.react("✅");
     } else {
@@ -78,11 +78,18 @@ class SignUpList {
     let index = 1;
     let mentions = [];
 
+    // console.log(message);
+    // console.log(await message.getContact());
+
     this.signUpList.forEach(element => {
-      returnMessage += `${index}. @${element.sender.id.user} signed up at ${new Date(element.timestamp*1000).toLocaleString('en-CA', {
+
+      // console.log(element.sender.id.user);
+      // console.log(element.sender.id._serialized);
+
+      returnMessage += `${index}. @${element.author.split("@")[0]} signed up at ${new Date(element.timestamp*1000).toLocaleString('en-CA', {
         timeZone: 'America/Toronto',
       })}\n`;
-      mentions.push(element.sender.id._serialized);
+      mentions.push(element.author);
       index += 1;
     });
     // console.log(returnMessage);

@@ -17,7 +17,7 @@ const unpaidListCommand = "unpaid list".toLowerCase();
 const paidCommand = "paid".toLowerCase();
 const unpaidCommand = "unpaid".toLowerCase();
 
-const groupName = "Crash Badminton Club".toLowerCase();
+const groupName = "Badminton Sign Up test".toLowerCase();
 let groupId; // = "120363151328519970@g.us";
 
 const isCorrectChat = message => {
@@ -116,9 +116,10 @@ client.on('ready', async () => {
 });
 
 client.on('message', async message => {
-  // console.log(message);
+  console.log(message);
+  console.log(await message.getContact());
   if (isCorrectChat(message)) {
-    // console.log("message received in correct group chat");
+    console.log("message received in correct group chat");
     if (isPublishMessage(message) && isAuthorAdmin(message)) {
       await publishMessage(message);
     } else if (isShowListMessage(message)) {
@@ -136,13 +137,12 @@ client.on('message', async message => {
     } else if (isNotInterestedMessage(message)) {
       await deleteEntry(message);
     } else {
-      // console.log("message in correct group chat doesnt concern me");
+      console.log("message in correct group chat doesnt concern me");
     }
   } else {
-    // console.log("message received in non relevant group chat");
+    console.log("message received in non relevant group chat");
   }
 });
 
 
 client.initialize();
-
