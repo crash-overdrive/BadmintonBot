@@ -17,7 +17,9 @@ const unpaidListCommand = "unpaid list".toLowerCase();
 const paidCommand = "paid".toLowerCase();
 const unpaidCommand = "unpaid".toLowerCase();
 
-const groupName = "Crash Badminton Club".toLowerCase();
+// const groupName = "Crash Badminton Club".toLowerCase();
+// const groupName = "Badminton sign up test".toLowerCase();
+const groupName = "Kings Court - general chat".toLowerCase();
 let groupId; // = "120363151328519970@g.us";
 
 const isCorrectChat = message => {
@@ -113,9 +115,38 @@ client.on('qr', qr => {
 client.on('ready', async () => {
   await setGroupId();
   console.log('Client is ready!');
+
+  participants = []
+  const group = await client.getChatById(groupId);
+
+  for (const index in group.groupMetadata.participants) {
+    const participantId = group.groupMetadata.participants[index].id._serialized;
+    const contact = await client.getContactById(participantId);
+
+    participants.push({
+      id: contact.id._serialized,
+      displayName: contact.pushname,
+      number: contact.number
+    })
+  }
+  console.log(participants);
 });
 
 client.on('message', async message => {
+  const x = await client.getChatById(groupId);
+
+  // console.log(x.groupMetadata.participants);
+  let mentions= []
+  for (const y in x.groupMetadata.participants) {
+    // console.log(y);
+    mentions.push(x.groupMetadata.participants[y].id._serialized);
+  }
+  console.log(mentions);
+
+  await message.reply("@16478294770", message.from, {mentions} )
+
+
+
   // console.log(message);
   if (isCorrectChat(message)) {
     // console.log("message received in correct group chat");
@@ -143,6 +174,10 @@ client.on('message', async message => {
   }
 });
 
+client.on('group_join', (notification) => {
+  // User has joined or been added to the group.
+  console.log(notification);
+  console.log(notification.id.participant);
+});
 
 client.initialize();
-
