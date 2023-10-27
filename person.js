@@ -1,11 +1,16 @@
 const SignUp = require("./sign-up");
 
 class Person {
-  constructor(id, number, displayName) {
+  constructor(id, number, displayName, isGuest) {
     this.id = id;
     this.number = number;
     this.displayName = displayName;
     this.signUp = null;
+    this.isGuest = isGuest;
+  }
+
+  isGuestMember() {
+    return this.isGuest;
   }
 
   hasSignedUp() {
@@ -13,6 +18,9 @@ class Person {
   }
 
   isSignedIn() {
+    if (this.signUp === null) {
+      // TODO: error out here, paid without signing up
+    }
     return this.signUp.isSignedIn();
   }
 
@@ -20,7 +28,6 @@ class Person {
     this.signUp = null;
   }
 
-  // TODO: what if its duplicate
   addSignUp(isSignedUp, signUpTimeStamp) {
     if (this.signUp !== null && this.signUp.isSignedIn === isSignedUp) {
       throw new Error("duplicate action");
@@ -35,11 +42,18 @@ class Person {
     this.signUp.addPaid(hasPaid, paidTimeStamp)
   }
 
+  removePaid() {
+    this.signUp.removePaid();
+  }
+
   isEqual(otherPerson) {
     return this.id === otherPerson.id;
   }
 
   getSignUpTimeStamp() {
+    if (this.signUp === null) {
+      // TODO: error out here, paid without signing up
+    }
     return this.signUp.getSignUpTimeStamp();
   }
 

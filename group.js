@@ -29,11 +29,11 @@ class Group {
     for (index in persons) {
       const person = persons[index];
 
-      this.personDictionary[person.id] = new Person(person.id, person.number, person.displayName);
+      this.personDictionary[person.id] = new Person(person.id, person.number, person.displayName, false);
     }
   }
 
-  // TODO: remove the non-members and guests added
+  // TODO: remove the non-members and guests added each time a new session is created
   addSession(date, startTime, endTime, numCourts) {
     this.session = new Session(date, startTime, endTime, numCourts);
 
@@ -42,9 +42,8 @@ class Group {
     }
   }
 
-  addPerson(personId) {
-    const person = getPersonByContactId(personId);
-    this.personDictionary[person.personId] = new Person(person.personId, person.number, person.displayName);
+  addPerson(person) {
+    this.personDictionary[person.personId] = person;
   }
 
   removePerson(personId) {
@@ -53,20 +52,23 @@ class Group {
 
   addPersonSignUp(personId, isSignedUp, signUpTimeStamp) {
     if (session !== null) {
+      // delete guest member if they are not signed up
+      if (this.personDictionary[personId].isGuestMember() && !isSignedUp) {
+        delete this.personDictionary[personId];
+      }
+      // for group member do the normal thing
       this.personDictionary[personId].addSignUp(isSignedUp, signUpTimeStamp);
     } else {
       throw Error("Trying to sign up when no session is active");
     }
   }
 
-  // TODO: fill this out
   addPersonPaid(personId, hasPaid, paidTimeStamp) {
-
+    this.personDictionary[personId].addPaid(hasPaid, paidTimeStamp);
   }
 
-  // TODO: fill this out
   removePersonPaid(personId) {
-
+    this.personDictionary[personId].removePaid();
   }
 
   getSignedInList() {
