@@ -3,25 +3,14 @@ import Person = require("./person");
 import SignUpEntry = require("./sign-up-entry");
 import WhatsappService = require("./wws-service");
 import utils = require("./utils");
+import { constants } from "./constants";
 
 function compareTimeStampsForSignUp(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
-  if (signUpEntryA.getSignUpTimeStamp()! < signUpEntryB.getSignUpTimeStamp()!) {
-    return 1;
-  }
-  if (signUpEntryA.getSignUpTimeStamp()! < signUpEntryB.getSignUpTimeStamp()!) {
-    return -1;
-  }
-  return 0;
+  return (signUpEntryA.getSignUpTimeStamp()! - signUpEntryB.getSignUpTimeStamp()!);
 }
 
 function compareTimeStampsForPaid(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
-  if (signUpEntryA.getPaidTimeStamp()! < signUpEntryB.getPaidTimeStamp()!) {
-    return 1;
-  }
-  if (signUpEntryA.getPaidTimeStamp()! < signUpEntryB.getPaidTimeStamp()!) {
-    return -1;
-  }
-  return 0;
+  return (signUpEntryA.getPaidTimeStamp()! - signUpEntryB.getPaidTimeStamp()!);
 }
 
 
@@ -57,9 +46,12 @@ class Session {
 
     for (const index in members) {
       const member = members[index];
-      const person = new Person(member.id, member.number, member.displayName, false);
-
-      this.#signUps[person.getId()] = new SignUpEntry(person);
+      
+      if (member.id !== WhatsappService.getSelfId()) {
+        const person = new Person(member.id, member.number, member.displayName, false);
+  
+        this.#signUps[person.getId()] = new SignUpEntry(person);
+      }
     }
   }
 

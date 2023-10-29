@@ -80,3 +80,22 @@ export const getAuthorForMessage = (message: WhatsappClient.Message): string => 
 export const getTimeStampForMessage = (message: WhatsappClient.Message): number => {
   return message.timestamp;
 }
+
+export const getChatIdForGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
+  return notification.chatId;
+}
+
+export const getAuthorForGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
+  return notification.author;
+}
+
+export const getMemberFromGroupNotification = async (notification: WhatsappClient.GroupNotification): Promise<Member> => {
+  const contactId = (notification.id as any).participant;
+  const member = await getMemberByContactId(contactId);
+
+  return member;
+}
+
+export const getSelfId = () : string => {
+  return getClient().info.wid._serialized;
+}

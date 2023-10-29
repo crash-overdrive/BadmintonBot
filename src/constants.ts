@@ -23,6 +23,10 @@ export const constants = {
   },
   ID: {
     OWNER: "16478294770@c.us",
-    SELF: "16477935174@c.us",
   },
+  SESSION_DEFAULTS : {
+    START_TIME: "9:30",
+    END_TIME: "11:30",
+    NUM_COURTS: 2
+  }
 }

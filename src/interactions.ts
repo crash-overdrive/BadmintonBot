@@ -1,7 +1,8 @@
 import WhatsappClient = require('whatsapp-web.js');
-import { getAuthorForMessage, getBodyForMessage, getChatIdForMessage, getMentionIdsInMessage, getTimeStampForMessage } from './wws-service';
+import { Member, getAuthorForGroupNotification, getAuthorForMessage, getBodyForMessage, getChatIdForGroupNotification, getChatIdForMessage, getMemberFromGroupNotification, getMentionIdsInMessage, getSelfId, getTimeStampForMessage } from './wws-service';
 import { constants } from './constants';
 import Groups = require('./groups');
+import Person = require('./person');
 
 const groups: Groups = new Groups();
 
@@ -15,7 +16,7 @@ const handleIfValidEnrollMessageByAdmin = (message: WhatsappClient.Message): voi
   const mentionedIds: string[] = getMentionIdsInMessage(message);
   const groupId: string = getChatIdForMessage(message);
 
-  if (messageBody.startsWith(constants.COMMANDS.ADMIN.ENROLL) && author === constants.ID.OWNER && mentionedIds.includes(constants.ID.SELF)) {
+  if (messageBody.startsWith(constants.COMMANDS.ADMIN.ENROLL) && author === constants.ID.OWNER && mentionedIds.includes(getSelfId())) {
     groups.addGroup(groupId);
   }
 }
@@ -28,9 +29,9 @@ const handleIfValidOpenSignUpMessageByAdmin = (message: WhatsappClient.Message):
   if (isBotEnrolledInGroup(groupId) && messageBody.startsWith(constants.COMMANDS.ADMIN.OPEN_SIGN_UPS) && author === constants.ID.OWNER) {
     const splitMessage = messageBody.split(" ");
     const dateTimeStamp = new Date(`${splitMessage[1]} ${splitMessage[2]} ${splitMessage[3]}`).getTime();
-    const startTime = splitMessage[4] ?? "9:30";
-    const endTime = splitMessage[5] ?? "11:30";
-    const numCourt = Number(splitMessage[6]) ?? 2;
+    const startTime = splitMessage[4] ?? constants.SESSION_DEFAULTS.START_TIME;
+    const endTime = splitMessage[5] ?? constants.SESSION_DEFAULTS.END_TIME;
+    const numCourt = isNaN(Number(splitMessage[6])) ? constants.SESSION_DEFAULTS.NUM_COURTS : Number(splitMessage[6]);
 
     groups.addSession(groupId, dateTimeStamp, startTime, endTime, numCourt)
   }
@@ -234,7 +235,23 @@ export const handleMessage = async (message: WhatsappClient.Message): Promise<vo
 }
 
 export const handleGroupJoin = async (notification: WhatsappClient.GroupNotification): Promise<void> => {
+  const groupId: string = getChatIdForGroupNotification(notification);
+  const member: Member = await getMemberFromGroupNotification(notification);
+  
+  console.log(notification);
+  console.log(groupId, member);
+
+  groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
+  console.log(groups.toString());
 }
 
 export const handleGroupLeave = async (notification: WhatsappClient.GroupNotification): Promise<void> => {
+  const groupId: string = getChatIdForGroupNotification(notification);
+  const author: string = getAuthorForGroupNotification(notification);
+  
+  console.log(notification);
+  console.log(groupId, author);
+
+  groups.removePerson(groupId, author);
+  console.log(groups.toString());
 }
