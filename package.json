@@ -2,6 +2,10 @@
   "dependencies": {
     "nodemon": "^3.0.1",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8"
+    "typescript": "^5.2.2",
+    "whatsapp-web.js": "^1.23.0"
+  },
+  "devDependencies": {
+    "@types/qrcode-terminal": "^0.12.1"
   }
 }

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": false,
+    "target": "ES6",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "moduleResolution": "Node",
+    "strictPropertyInitialization": true,
+    "strictNullChecks": true,
+    "module": "CommonJS",
+
+    "skipLibCheck": true,
+    // "allowSyntheticDefaultImports": true,
+  },
+  "include": ["./src/**/*"]
+}
