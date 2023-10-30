@@ -98,7 +98,6 @@ class Groups {
     for (const groupId in this.#groups) {
       const group = this.#groups[groupId];
 
-
       stringValue += `${groupId} ${group.toString()}`;
     }
     return stringValue;

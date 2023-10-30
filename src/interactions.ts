@@ -179,6 +179,7 @@ const handleIfValidPaidMessage = (message: WhatsappClient.Message): void => {
   const timeStamp: number = getTimeStampFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && messageBody === constants.COMMANDS.USER.PAID) {
+    // TODO: handle guests
     groups.setPaid(groupId, author, true, timeStamp);
   }
 }
@@ -190,6 +191,7 @@ const handleIfValidUnpaidMessage = (message: WhatsappClient.Message): void => {
   const timeStamp: number = getTimeStampFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && messageBody === constants.COMMANDS.USER.UNPAID) {
+    // TODO: handle guests
     groups.setPaid(groupId, author, false, timeStamp);
   }
 }
@@ -242,7 +244,6 @@ export const handleGroupJoin = async (notification: WhatsappClient.GroupNotifica
     if (isBotEnrolledInGroup(groupId)) {
       groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
     }
-    console.log(groups.toString());
   } catch(error: unknown) {
     console.log(error);
   }
@@ -256,7 +257,6 @@ export const handleGroupLeave = async (notification: WhatsappClient.GroupNotific
     if (isBotEnrolledInGroup(groupId)) {
       groups.removePerson(groupId, personId);
     }
-    console.log(groups.toString());
   } catch(error: unknown) {
     console.log(error);
   }

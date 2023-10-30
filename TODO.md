@@ -22,70 +22,12 @@ nvm install 16.0.0
 npm install --build-from-source
 
 
-// TODO: add database?
-// TODO: change me, Jessica, Zikun to be paid by default
+// TODO: add database
 // TODO: mention waitlist
 // TODO: whatsapp formatting for messages
-// TODO: add option for guests
+// TODO: add option for guests ("in +1 / +2 / +3 and out +1 out +2 out +3 and paid +1 paid +2 paid +3 and unpaid +1 unpaid +2 unpaid +3")
 // TODO: add uneroll from group
-// TODO: sort the different lists
-
-Bugs:
-Array sorted - not tested
-Some weird bug of people not getting tagged?? check diff to see what can go wrong - its because the name is set wrong, but why is it wrong when it was right earlier??
-People leaving and joining the group is causing issues
-
 // TODO: improve adding new stuff to dicts and what not so that you can react to peoples message to give user feedback
-
-// "whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8",
-
-Group remove notification
-GroupNotification {
-  id: {
-    fromMe: false,
-    remote: '120363151328519970@g.us',
-    id: '35301513671698613346',
-    participant: '16475711215@c.us',
-    _serialized: 'false_120363151328519970@g.us_35301513671698613346_16475711215@c.us'
-  },
-  body: '',
-  type: 'remove',
-  timestamp: 1698613346,
-  chatId: '120363151328519970@g.us',
-  author: '16478294770@c.us',
-  recipientIds: [ '16475711215@c.us' ]
-}
-
-Group add notification 
-GroupNotification {
-  id: {
-    fromMe: false,
-    remote: '120363151328519970@g.us',
-    id: '16392165511698613295',
-    participant: '16475711215@c.us',
-    _serialized: 'false_120363151328519970@g.us_16392165511698613295_16475711215@c.us'
-  },
-  body: '',
-  type: 'add',
-  timestamp: 1698613295,
-  chatId: '120363151328519970@g.us',
-  author: '16478294770@c.us',
-  recipientIds: [ '16475711215@c.us' ]
-}
-
-Group leave notification
-GroupNotification {
-  id: {
-    fromMe: false,
-    remote: '120363151328519970@g.us',
-    id: '31068622741698636847',
-    participant: '16478294770@c.us',
-    _serialized: 'false_120363151328519970@g.us_31068622741698636847_16478294770@c.us'
-  },
-  body: '',
-  type: 'leave',
-  timestamp: 1698636847,
-  chatId: '120363151328519970@g.us',
-  author: '16478294770@c.us',
-  recipientIds: [ '16478294770@c.us' ]
-}
+// TODO: update display name in real time each time list is called (toString is called)
+// TODO: Tag people who are in undecided list
+// TODO: take paid status out from list command, take it to paid/unpaid list
