@@ -29,6 +29,7 @@ class Person {
     if (this.#isGuest) {
       return this.#id; // TODO: confirm what this should be
     } else if (utils.isUndefined(this.#displayName)) {
+      // TODO: this should be tried to be updated before returning number
       return `@${this.#number}`;
     } else {
       return this.#displayName as string;

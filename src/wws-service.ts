@@ -3,18 +3,18 @@ import utils = require('./utils');
 
 let client: WhatsappClient.Client;
 
+const getContactIdFromParticipant = (participant: WhatsappClient.GroupParticipant): string => {
+  return participant.id._serialized;
+}
+
 const getGroupChatByChatId = async (chatId: string): Promise<WhatsappClient.GroupChat> => {
   return await getClient().getChatById(chatId) as WhatsappClient.GroupChat;
 }
 
-const getMembersFromGroupChat = async (chatId: string): Promise<WhatsappClient.GroupParticipant[]> => {
+const getParticipantsFromGroupChat = async (chatId: string): Promise<WhatsappClient.GroupParticipant[]> => {
   const groupChat: WhatsappClient.GroupChat = await getGroupChatByChatId(chatId);
 
   return groupChat.participants;
-}
-
-const getContactIdFromParticipant = (participant: WhatsappClient.GroupParticipant): string => {
-  return participant.id._serialized;
 }
 
 const getContactByContactId = async (contactId: string): Promise<WhatsappClient.Contact> => {
@@ -47,9 +47,9 @@ export const getMemberByContactId = async (contactId: string): Promise<Member> =
   return member;
 }
 
-export const getMemberFromGroupChat = async (groupId: string): Promise<Member[]> => {
+export const getMembersFromGroupChat = async (groupId: string): Promise<Member[]> => {
   let members: Member[] = []
-  const groupChatMembers: WhatsappClient.GroupParticipant[] = await getMembersFromGroupChat(groupId);
+  const groupChatMembers: WhatsappClient.GroupParticipant[] = await getParticipantsFromGroupChat(groupId);
 
   for (const index in groupChatMembers) {
     const participant = groupChatMembers[index]
@@ -61,38 +61,38 @@ export const getMemberFromGroupChat = async (groupId: string): Promise<Member[]>
   return members;
 }
 
-export const getChatIdForMessage = (message: WhatsappClient.Message): string => {
+export const getChatIdFromMessage = (message: WhatsappClient.Message): string => {
   return message.from;
 }
 
-export const getBodyForMessage = (message: WhatsappClient.Message): string => {
+export const getBodyFromMessage = (message: WhatsappClient.Message): string => {
   return message.body.trim().toLowerCase();
 }
 
-export const getMentionIdsInMessage = (message: WhatsappClient.Message): string[] => {
+export const getMentionIdsFromMessage = (message: WhatsappClient.Message): string[] => {
   return message.mentionedIds;
 }
 
-export const getAuthorForMessage = (message: WhatsappClient.Message): string => {
+export const getAuthorFromMessage = (message: WhatsappClient.Message): string => {
   return message.author as string;
 }
 
-export const getTimeStampForMessage = (message: WhatsappClient.Message): number => {
+export const getTimeStampFromMessage = (message: WhatsappClient.Message): number => {
   return message.timestamp;
 }
 
-export const getChatIdForGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
+export const getChatIdFromGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
   return notification.chatId;
 }
 
-export const getAffectedMemberForGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
+export const getAffectedMembersContactIdFromGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
   const affectedMemberId = (notification.id as any).participant;
 
   return affectedMemberId;
 }
 
 export const getMemberFromGroupNotification = async (notification: WhatsappClient.GroupNotification): Promise<Member> => {
-  const contactId = getAffectedMemberForGroupNotification(notification);
+  const contactId = getAffectedMembersContactIdFromGroupNotification(notification);
   const member = await getMemberByContactId(contactId);
 
   return member;

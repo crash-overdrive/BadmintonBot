@@ -41,14 +41,14 @@ class Session {
   }
 
   async #initSignUps(): Promise<void> {
-    const members: WhatsappService.Member[] = await WhatsappService.getMemberFromGroupChat(this.#groupId);
+    const members: WhatsappService.Member[] = await WhatsappService.getMembersFromGroupChat(this.#groupId);
 
     for (const index in members) {
       const member = members[index];
-      
+
       if (member.id !== WhatsappService.getSelfId()) {
         const person = new Person(member.id, member.number, member.displayName, false);
-  
+
         this.#signUps[person.getId()] = new SignUpEntry(person);
       }
     }
