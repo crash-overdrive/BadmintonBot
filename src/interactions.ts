@@ -1,5 +1,5 @@
 import WhatsappClient = require('whatsapp-web.js');
-import { Member, getAuthorForGroupNotification, getAuthorForMessage, getBodyForMessage, getChatIdForGroupNotification, getChatIdForMessage, getMemberFromGroupNotification, getMentionIdsInMessage, getSelfId, getTimeStampForMessage } from './wws-service';
+import { Member, getAffectedMemberForGroupNotification, getAuthorForMessage, getBodyForMessage, getChatIdForGroupNotification, getChatIdForMessage, getMemberFromGroupNotification, getMentionIdsInMessage, getSelfId, getTimeStampForMessage } from './wws-service';
 import { constants } from './constants';
 import Groups = require('./groups');
 import Person = require('./person');
@@ -235,23 +235,35 @@ export const handleMessage = async (message: WhatsappClient.Message): Promise<vo
 }
 
 export const handleGroupJoin = async (notification: WhatsappClient.GroupNotification): Promise<void> => {
-  const groupId: string = getChatIdForGroupNotification(notification);
-  const member: Member = await getMemberFromGroupNotification(notification);
+  try {
+    const groupId: string = getChatIdForGroupNotification(notification);
+    const member: Member = await getMemberFromGroupNotification(notification);
+    
+    console.log(notification);
+    console.log(groupId, member);
   
-  console.log(notification);
-  console.log(groupId, member);
-
-  groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
-  console.log(groups.toString());
+    if (isBotEnrolledInGroup(groupId)) {
+      groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
+    }
+    console.log(groups.toString());
+  } catch(error: unknown) {
+    console.log(error);
+  }
 }
 
 export const handleGroupLeave = async (notification: WhatsappClient.GroupNotification): Promise<void> => {
-  const groupId: string = getChatIdForGroupNotification(notification);
-  const author: string = getAuthorForGroupNotification(notification);
-  
-  console.log(notification);
-  console.log(groupId, author);
+  try {
+    const groupId: string = getChatIdForGroupNotification(notification);
+    const author: string = getAffectedMemberForGroupNotification(notification);
+    
+    console.log(notification);
+    console.log(groupId, author);
 
-  groups.removePerson(groupId, author);
-  console.log(groups.toString());
+    if (isBotEnrolledInGroup(groupId)) {
+      groups.removePerson(groupId, author);
+    }
+    console.log(groups.toString());
+  } catch(error: unknown) {
+    console.log(error);
+  }
 }

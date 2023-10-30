@@ -3,7 +3,6 @@ import Person = require("./person");
 import SignUpEntry = require("./sign-up-entry");
 import WhatsappService = require("./wws-service");
 import utils = require("./utils");
-import { constants } from "./constants";
 
 function compareTimeStampsForSignUp(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
   return (signUpEntryA.getSignUpTimeStamp()! - signUpEntryB.getSignUpTimeStamp()!);

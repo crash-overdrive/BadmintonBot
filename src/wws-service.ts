@@ -85,12 +85,14 @@ export const getChatIdForGroupNotification = (notification: WhatsappClient.Group
   return notification.chatId;
 }
 
-export const getAuthorForGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
-  return notification.author;
+export const getAffectedMemberForGroupNotification = (notification: WhatsappClient.GroupNotification): string => {
+  const affectedMemberId = (notification.id as any).participant;
+
+  return affectedMemberId;
 }
 
 export const getMemberFromGroupNotification = async (notification: WhatsappClient.GroupNotification): Promise<Member> => {
-  const contactId = (notification.id as any).participant;
+  const contactId = getAffectedMemberForGroupNotification(notification);
   const member = await getMemberByContactId(contactId);
 
   return member;

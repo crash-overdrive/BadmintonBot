@@ -32,7 +32,7 @@ npm install --build-from-source
 
 Bugs:
 Array sorted - not tested
-Some weird bug of people not getting tagged?? check diff to see what can go wrong
+Some weird bug of people not getting tagged?? check diff to see what can go wrong - its because the name is set wrong, but why is it wrong when it was right earlier??
 People leaving and joining the group is causing issues
 
 // TODO: improve adding new stuff to dicts and what not so that you can react to peoples message to give user feedback
@@ -71,4 +71,21 @@ GroupNotification {
   chatId: '120363151328519970@g.us',
   author: '16478294770@c.us',
   recipientIds: [ '16475711215@c.us' ]
+}
+
+Group leave notification
+GroupNotification {
+  id: {
+    fromMe: false,
+    remote: '120363151328519970@g.us',
+    id: '31068622741698636847',
+    participant: '16478294770@c.us',
+    _serialized: 'false_120363151328519970@g.us_31068622741698636847_16478294770@c.us'
+  },
+  body: '',
+  type: 'leave',
+  timestamp: 1698636847,
+  chatId: '120363151328519970@g.us',
+  author: '16478294770@c.us',
+  recipientIds: [ '16478294770@c.us' ]
 }
