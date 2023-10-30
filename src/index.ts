@@ -27,6 +27,4 @@ client.on('group_leave', (notification) => {
   handleGroupLeave(notification);
 });
 
-client.setDisplayName("Kings Court Bot")
-
 client.initialize();
