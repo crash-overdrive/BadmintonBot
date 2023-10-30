@@ -22,16 +22,12 @@ nvm install 16.0.0
 npm install --build-from-source
 
 
-// TODO: default time if time not set 9 PM
-// TODO: change list option to show whether paid or not
-// TODO: add database?
-// TODO: change me, Jessica, Zikun to be paid by default
+// TODO: add database
 // TODO: mention waitlist
-// TODO: add option of passing # of courts
-// TODO: change list to show how many courts we have and about waitlist
 // TODO: whatsapp formatting for messages
-// TODO: add option for guests
-
+// TODO: add option for guests ("in +1 / +2 / +3 and out +1 out +2 out +3 and paid +1 paid +2 paid +3 and unpaid +1 unpaid +2 unpaid +3")
+// TODO: add uneroll from group
 // TODO: improve adding new stuff to dicts and what not so that you can react to peoples message to give user feedback
-
-// "whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8",
+// TODO: update display name in real time each time list is called (toString is called)
+// TODO: Tag people who are in undecided list
+// TODO: take paid status out from list command, take it to paid/unpaid list

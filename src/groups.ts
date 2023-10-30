@@ -2,7 +2,6 @@
 // init them from constructors and get group from constants file
 
 import Group = require("./group");
-import SignUpEntry = require("./sign-up-entry");
 import Person = require("./person");
 
 class Groups {
@@ -98,7 +97,6 @@ class Groups {
 
     for (const groupId in this.#groups) {
       const group = this.#groups[groupId];
-
 
       stringValue += `${groupId} ${group.toString()}`;
     }

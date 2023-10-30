@@ -5,23 +5,11 @@ import WhatsappService = require("./wws-service");
 import utils = require("./utils");
 
 function compareTimeStampsForSignUp(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
-  if (signUpEntryA.getSignUpTimeStamp()! < signUpEntryB.getSignUpTimeStamp()!) {
-    return 1;
-  }
-  if (signUpEntryA.getSignUpTimeStamp()! < signUpEntryB.getSignUpTimeStamp()!) {
-    return -1;
-  }
-  return 0;
+  return (signUpEntryA.getSignUpTimeStamp()! - signUpEntryB.getSignUpTimeStamp()!);
 }
 
 function compareTimeStampsForPaid(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
-  if (signUpEntryA.getPaidTimeStamp()! < signUpEntryB.getPaidTimeStamp()!) {
-    return 1;
-  }
-  if (signUpEntryA.getPaidTimeStamp()! < signUpEntryB.getPaidTimeStamp()!) {
-    return -1;
-  }
-  return 0;
+  return (signUpEntryA.getPaidTimeStamp()! - signUpEntryB.getPaidTimeStamp()!);
 }
 
 
@@ -31,6 +19,7 @@ class Session {
   #startTime: string;
   #endTime: string;
   #numCourts: number;
+  #maxSignIns: number;
   #signUps: {[personId: string]: SignUpEntry};
 
   constructor(groupId: string, date: number, startTime: string, endTime: string, numCourts: number) {
@@ -39,6 +28,7 @@ class Session {
     this.#startTime = startTime;
     this.#endTime = endTime;
     this.#numCourts = numCourts;
+    this.#maxSignIns = (this.#numCourts + 1) * 4;
     this.#signUps = {};
 
     this.#initSignUps();
@@ -53,13 +43,16 @@ class Session {
   }
 
   async #initSignUps(): Promise<void> {
-    const members: WhatsappService.Member[] = await WhatsappService.getMemberFromGroupChat(this.#groupId);
+    const members: WhatsappService.Member[] = await WhatsappService.getMembersFromGroupChat(this.#groupId);
 
     for (const index in members) {
       const member = members[index];
-      const person = new Person(member.id, member.number, member.displayName, false);
 
-      this.#signUps[person.getId()] = new SignUpEntry(person);
+      if (member.id !== WhatsappService.getSelfId()) {
+        const person = new Person(member.id, member.number, member.displayName, false);
+
+        this.#signUps[person.getId()] = new SignUpEntry(person);
+      }
     }
   }
 
@@ -133,12 +126,15 @@ class Session {
 
   getSignedInListString(): string {
     const inList = this.#getSignedInList();
-    let stringValue = "\n*Signed In People*\n"
+    let stringValue = "\n*Signed In (see you soon!)*\n"
     let number = 1;
 
     for (const index in inList) {
       const inPerson = inList[index];
 
+      if (number === this.#maxSignIns + 1) {
+        stringValue += `*_Everyone below is on WAITLIST_*\n`;
+      }
       stringValue += `${number}. ${inPerson.toString()}\n`;
       number += 1;
     }
@@ -163,7 +159,7 @@ class Session {
 
   getSignedOutListString(): string {
     const outList = this.#getSignedOutList();
-    let stringValue = "\n*Signed Out People*\n"
+    let stringValue = "\n*Signed Out (hope to see you next time)*\n"
     let number = 1;
 
     for (const index in outList) {
@@ -192,7 +188,7 @@ class Session {
 
   getUndecidedListString(): string {
     const undecidedList = this.#getUndecidedList();
-    let stringValue = "\n*Undecided People*\n"
+    let stringValue = `\n*Undecided (type _in_ or _out_ to stop getting tagged)*\n`
     let number = 1;
 
     for (const index in undecidedList) {
@@ -271,7 +267,8 @@ class Session {
   }
 
   toString(): string {
-    let stringValue: string = `*Date* -  ${utils.convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}\n*Courts* - ${this.#numCourts}\n`;
+    let stringValue: string = `*Date* -  ${utils.convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n`;
+    stringValue += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n`;
 
     stringValue += this.getSignedInListString();
     stringValue += this.getSignedOutListString();

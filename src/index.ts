@@ -14,7 +14,6 @@ client.on('ready', async () => {
 
 // message sent to any chat
 client.on('message', async message => {
-  // console.log(message.body);
   handleMessage(message);
 })
 
