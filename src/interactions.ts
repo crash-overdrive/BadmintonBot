@@ -1,8 +1,8 @@
-import WhatsappClient = require('whatsapp-web.js');
+import { Message, GroupNotification } from 'whatsapp-web.js';
 import { Member, getAffectedMembersContactIdFromGroupNotification, getAuthorFromMessage, getBodyFromMessage, getChatIdFromGroupNotification, getChatIdFromMessage, getMemberFromGroupNotification, getMentionIdsFromMessage, getSelfId, getTimeStampFromMessage } from './wws-service';
 import { constants } from './constants';
-import Groups = require('./groups');
-import Person = require('./person');
+import { Groups } from './groups';
+import { Person } from './person';
 
 const groups: Groups = new Groups();
 
@@ -10,7 +10,7 @@ const isBotEnrolledInGroup = (groupId: string): boolean => {
   return groups.getGroup(groupId) !== undefined;
 }
 
-const handleIfValidEnrollMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidEnrollMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const mentionedIds: string[] = getMentionIdsFromMessage(message);
@@ -21,7 +21,7 @@ const handleIfValidEnrollMessageByAdmin = (message: WhatsappClient.Message): voi
   }
 }
 
-const handleIfValidOpenSignUpMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidOpenSignUpMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -37,7 +37,7 @@ const handleIfValidOpenSignUpMessageByAdmin = (message: WhatsappClient.Message):
   }
 }
 
-const handleIfValidInMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidInMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const mentionedIds: string[] = getMentionIdsFromMessage(message);
@@ -45,14 +45,13 @@ const handleIfValidInMessageByAdmin = (message: WhatsappClient.Message): void =>
   const timeStamp: number = getTimeStampFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && mentionedIds.length !== 0 && messageBody.startsWith(constants.COMMANDS.ADMIN.IN) && author === constants.ID.OWNER) {
-    for (const index in mentionedIds) {
-      const personId = mentionedIds[index];
+    for (const personId of mentionedIds) {
       groups.setSignUp(groupId, personId, true, timeStamp);
     }
   }
 }
 
-const handleIfValidOutMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidOutMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const mentionedIds: string[] = getMentionIdsFromMessage(message);
@@ -60,14 +59,13 @@ const handleIfValidOutMessageByAdmin = (message: WhatsappClient.Message): void =
   const timeStamp: number = getTimeStampFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && mentionedIds.length !== 0 && messageBody.startsWith(constants.COMMANDS.ADMIN.OUT) && author === constants.ID.OWNER) {
-    for (const index in mentionedIds) {
-      const personId = mentionedIds[index];
+    for (const personId of mentionedIds) {
       groups.setSignUp(groupId, personId, false, timeStamp);
     }
   }
 }
 
-const handleIfValidPaidMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidPaidMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const mentionedIds: string[] = getMentionIdsFromMessage(message);
@@ -75,14 +73,13 @@ const handleIfValidPaidMessageByAdmin = (message: WhatsappClient.Message): void 
   const timeStamp: number = getTimeStampFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && mentionedIds.length !== 0 && messageBody.startsWith(constants.COMMANDS.ADMIN.PAID) && author === constants.ID.OWNER) {
-    for (const index in mentionedIds) {
-      const personId = mentionedIds[index];
+    for (const personId of mentionedIds) {
       groups.setPaid(groupId, personId, true, timeStamp);
     }
   }
 }
 
-const handleIfValidUnpaidMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidUnpaidMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const mentionedIds: string[] = getMentionIdsFromMessage(message);
@@ -90,14 +87,13 @@ const handleIfValidUnpaidMessageByAdmin = (message: WhatsappClient.Message): voi
   const timeStamp: number = getTimeStampFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && mentionedIds.length !== 0 && messageBody.startsWith(constants.COMMANDS.ADMIN.UNPAID) && author === constants.ID.OWNER) {
-    for (const index in mentionedIds) {
-      const personId = mentionedIds[index];
+    for (const personId of mentionedIds) {
       groups.setPaid(groupId, personId, false, timeStamp);
     }
   }
 }
 
-const handleIfValidInListMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidInListMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -107,7 +103,7 @@ const handleIfValidInListMessageByAdmin = (message: WhatsappClient.Message): voi
   }
 }
 
-const handleIfValidOutListMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidOutListMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -117,7 +113,7 @@ const handleIfValidOutListMessageByAdmin = (message: WhatsappClient.Message): vo
   }
 }
 
-const handleIfValidUndecidedListMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidUndecidedListMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -127,7 +123,7 @@ const handleIfValidUndecidedListMessageByAdmin = (message: WhatsappClient.Messag
   }
 }
 
-const handleIfValidPaidListMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidPaidListMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -137,7 +133,7 @@ const handleIfValidPaidListMessageByAdmin = (message: WhatsappClient.Message): v
   }
 }
 
-const handleIfValidUnpaidListMessageByAdmin = (message: WhatsappClient.Message): void => {
+const handleIfValidUnpaidListMessageByAdmin = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -148,7 +144,7 @@ const handleIfValidUnpaidListMessageByAdmin = (message: WhatsappClient.Message):
 }
 
 // user level messages
-const handleIfValidInMessage = (message: WhatsappClient.Message): void => {
+const handleIfValidInMessage = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -160,7 +156,7 @@ const handleIfValidInMessage = (message: WhatsappClient.Message): void => {
   }
 }
 
-const handleIfValidOutMessage = (message: WhatsappClient.Message): void => {
+const handleIfValidOutMessage = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -172,7 +168,7 @@ const handleIfValidOutMessage = (message: WhatsappClient.Message): void => {
   }
 }
 
-const handleIfValidPaidMessage = (message: WhatsappClient.Message): void => {
+const handleIfValidPaidMessage = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -184,7 +180,7 @@ const handleIfValidPaidMessage = (message: WhatsappClient.Message): void => {
   }
 }
 
-const handleIfValidUnpaidMessage = (message: WhatsappClient.Message): void => {
+const handleIfValidUnpaidMessage = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
   const author: string = getAuthorFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -196,16 +192,16 @@ const handleIfValidUnpaidMessage = (message: WhatsappClient.Message): void => {
   }
 }
 
-const handleIfValidListMessage = async (message: WhatsappClient.Message): Promise<void> => {
+const handleIfValidListMessage = async (message: Message): Promise<void> => {
   const messageBody: string = getBodyFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && messageBody === constants.COMMANDS.USER.LIST) {
-    await message.reply(groups.getGroup(groupId).toString(), groupId, groups.getGroup(groupId).getMentionsList());
+    await message.reply(await groups.getGroup(groupId).toString(), groupId, groups.getGroup(groupId).getMentionsList());
   }
 }
 
-export const handleMessage = async (message: WhatsappClient.Message): Promise<void> => {
+export const handleMessage = async (message: Message): Promise<void> => {
   try {
     // admin/owner only message - can be sent to any group to enroll the bot in a group
     handleIfValidEnrollMessageByAdmin(message);
@@ -236,20 +232,20 @@ export const handleMessage = async (message: WhatsappClient.Message): Promise<vo
   }
 }
 
-export const handleGroupJoin = async (notification: WhatsappClient.GroupNotification): Promise<void> => {
+export const handleGroupJoin = async (notification: GroupNotification): Promise<void> => {
   try {
     const groupId: string = getChatIdFromGroupNotification(notification);
     const member: Member = await getMemberFromGroupNotification(notification);
 
     if (isBotEnrolledInGroup(groupId)) {
-      groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
+      await groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
     }
   } catch(error: unknown) {
     console.log(error);
   }
 }
 
-export const handleGroupLeave = async (notification: WhatsappClient.GroupNotification): Promise<void> => {
+export const handleGroupLeave = (notification: GroupNotification): void => {
   try {
     const groupId: string = getChatIdFromGroupNotification(notification);
     const personId: string = getAffectedMembersContactIdFromGroupNotification(notification);

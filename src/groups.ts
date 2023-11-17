@@ -1,10 +1,10 @@
 // used to direct message to appropriate group
 // init them from constructors and get group from constants file
 
-import Group = require("./group");
-import Person = require("./person");
+import { Group } from "./group";
+import { Person } from "./person";
 
-class Groups {
+export class Groups {
   #groups: {[groupId: string]: Group};
   constructor() {
     this.#groups = {};
@@ -24,8 +24,8 @@ class Groups {
     this.#groups[groupId].addSession(dateTimeStamp, startTime, endTime, numCourts);
   }
 
-  addPerson(groupId: string, person: Person): void {
-    this.#groups[groupId].addPerson(person);
+  async addPerson(groupId: string, person: Person): Promise<void> {
+    await this.#groups[groupId].addPerson(person);
   }
 
   removePerson(groupId: string, personId: string): void {
@@ -34,6 +34,14 @@ class Groups {
 
   isGuestMember(groupId: string, personId: string): boolean | undefined {
     return this.#groups[groupId].isGuestMember( personId);
+  }
+
+  getNumber(groupId: string, personId: string): string | undefined {
+    return this.#groups[groupId].getNumber(personId);
+  }
+
+  async getDisplayName(groupId: string, personId: string): Promise<string | undefined> {
+    return this.#groups[groupId].getDisplayName(personId);
   }
 
   hasSignedUp(groupId: string, personId: string): boolean | undefined {
@@ -68,23 +76,23 @@ class Groups {
     return this.#groups[groupId].getPaidTimeStamp(personId);
   }
 
-  getSignedInListString(groupId: string): string | undefined {
+  async getSignedInListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getSignedInListString();
   }
 
-  getSignedOutListString(groupId: string): string | undefined {
+  async getSignedOutListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getSignedOutListString();
   }
 
-  getUndecidedListString(groupId: string): string | undefined {
+  async getUndecidedListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getUndecidedListString();
   }
 
-  getPaidListString(groupId: string): string | undefined {
+  async getPaidListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getPaidListString();
   }
 
-  getUnpaidListString(groupId: string): string | undefined {
+  async getUnpaidListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getUnpaidListString();
   }
 
@@ -92,16 +100,14 @@ class Groups {
     return this.#groups[groupId].getMentionsList();
   }
 
-  toString(): string {
+  async toString(): Promise<string> {
     let stringValue: string = `*Groups*\n`;
 
     for (const groupId in this.#groups) {
       const group = this.#groups[groupId];
 
-      stringValue += `${groupId} ${group.toString()}`;
+      stringValue += `${groupId} ${await group.toString()}`;
     }
     return stringValue;
   }
 }
-
-export = Groups;

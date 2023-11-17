@@ -1,6 +1,6 @@
-import utils = require('./utils');
+import { convertTimeStampToString } from './utils';
 
-class Paid {
+export class Paid {
   #hasPaid: boolean;
   #paidTimeStamp: number;
 
@@ -24,10 +24,8 @@ class Paid {
 
   toString(): string {
     if (this.#hasPaid) {
-      return `Paid Status: ✅ @ ${utils.convertTimeStampToString(this.#paidTimeStamp)}`
+      return `Paid Status: ✅ @ ${convertTimeStampToString(this.#paidTimeStamp)}`
     }
     return `Paid Status: ❌`
   }
 }
-
-export = Paid;

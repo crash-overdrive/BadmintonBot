@@ -1,8 +1,8 @@
 
-import Person = require("./person");
-import SignUpEntry = require("./sign-up-entry");
-import WhatsappService = require("./wws-service");
-import utils = require("./utils");
+import { Person } from "./person";
+import { SignUpEntry } from "./sign-up-entry";
+import { Member, sendMessage, getSelfId, getMembersFromGroupChat, getChatNameFromChatId } from "./wws-service";
+import { convertTimeStampToDate, isUndefined } from "./utils";
 
 function compareTimeStampsForSignUp(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
   return (signUpEntryA.getSignUpTimeStamp()! - signUpEntryB.getSignUpTimeStamp()!);
@@ -12,8 +12,7 @@ function compareTimeStampsForPaid(signUpEntryA: SignUpEntry, signUpEntryB: SignU
   return (signUpEntryA.getPaidTimeStamp()! - signUpEntryB.getPaidTimeStamp()!);
 }
 
-
-class Session {
+export class Session {
   #groupId: string;
   #date: number;
   #startTime: string;
@@ -28,11 +27,72 @@ class Session {
     this.#startTime = startTime;
     this.#endTime = endTime;
     this.#numCourts = numCourts;
-    this.#maxSignIns = (this.#numCourts + 1) * 4;
+    this.#maxSignIns = (this.#numCourts) * 6;
     this.#signUps = {};
 
-    this.#initSignUps();
+    this.#initSignUps().then(
+      () => {},
+      () => {}
+    );
   }
+
+  async #initSignUps(): Promise<void> {
+    const members: Member[] = await getMembersFromGroupChat(this.#groupId);
+
+    for (const member of members) {
+      if (member.id !== getSelfId()) {
+        const person = new Person(member.id, member.number, member.displayName, false);
+
+        await this.#addSignUpEntry(person);
+      }
+    }
+  }
+
+  async #addSignUpEntry(person: Person) {
+    this.#signUps[person.getId()] = new SignUpEntry(person);
+    await this.#notifySignUpOpen(person);
+  }
+  
+  async #notifySignUpOpen(person: Person): Promise<void> {
+    if (!person.isGuestMember()) {
+      await sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
+    }
+  }
+
+  async notifyUndecidedMembers(): Promise<void> {
+    // get unsigned member check for guest and send them message, check for display name as well
+
+    // const job = new CronJob(
+    //   '* * * * * *', // cronTime
+    //   function () {
+    //     console.log('You will see this message every second');
+    //   }, // onTick
+    //   null, // onComplete
+    //   true, // start
+    //   'America/Toronto' // timeZone
+    // );
+  }
+
+  async #getSignUpOpenMessage(member: Person): Promise<string> {
+    // check for display name
+    const displayName = await member.getDisplayName();
+    const chatName = await getChatNameFromChatId(this.#groupId);
+    let signUpOpenMessage = `Hi ${displayName || member.getNumber()}\n\n`;
+    signUpOpenMessage += `Sign ups are now open in the group *${chatName}*\n\n`;
+    signUpOpenMessage += `Please make sure to type *"in"* or *"out"* in the group to indicate your availability\n\n`;
+    signUpOpenMessage += `Session details are as follows\n\n`;
+    signUpOpenMessage += this.#getSessionDetails();
+
+    if (isUndefined(displayName)) {
+      signUpOpenMessage += `I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
+    }
+
+    return signUpOpenMessage;
+  }
+
+  // #getUndecidedMessage(member: Person): string {
+    
+  // }
 
   modifySessionDetails(groupId: string, date: number, startTime: string, endTime: string, numCourts: number) {
     this.#groupId = groupId;
@@ -42,26 +102,12 @@ class Session {
     this.#numCourts = numCourts;
   }
 
-  async #initSignUps(): Promise<void> {
-    const members: WhatsappService.Member[] = await WhatsappService.getMembersFromGroupChat(this.#groupId);
-
-    for (const index in members) {
-      const member = members[index];
-
-      if (member.id !== WhatsappService.getSelfId()) {
-        const person = new Person(member.id, member.number, member.displayName, false);
-
-        this.#signUps[person.getId()] = new SignUpEntry(person);
-      }
-    }
-  }
-
   getDate(): number {
     return this.#date;
   }
 
-  addPerson(person: Person): void {
-    this.#signUps[person.getId()] = new SignUpEntry(person);
+  async addPerson(person: Person): Promise<void> {
+    await this.#addSignUpEntry(person);
   }
 
   removePerson(personId: string): void {
@@ -70,6 +116,14 @@ class Session {
 
   isGuestMember(personId: string): boolean {
     return this.#signUps[personId].isGuestMember();
+  }
+
+  getNumber(personId: string): string {
+    return this.#signUps[personId].getNumber();
+  }
+
+  async getDisplayName(personId: string): Promise<string | undefined> {
+    return this.#signUps[personId].getDisplayName();
   }
 
   hasSignedUp(personId: string): boolean {
@@ -124,18 +178,16 @@ class Session {
     return inList;
   }
 
-  getSignedInListString(): string {
+  async getSignedInListString(): Promise<string> {
     const inList = this.#getSignedInList();
     let stringValue = "\n*Signed In (see you soon!)*\n"
     let number = 1;
 
-    for (const index in inList) {
-      const inPerson = inList[index];
-
+    for (const inPerson of inList) {
       if (number === this.#maxSignIns + 1) {
         stringValue += `*_Everyone below is on WAITLIST_*\n`;
       }
-      stringValue += `${number}. ${inPerson.toString()}\n`;
+      stringValue += `${number}. ${await inPerson.toString()}\n`;
       number += 1;
     }
 
@@ -157,15 +209,13 @@ class Session {
     return outList;
   }
 
-  getSignedOutListString(): string {
+  async getSignedOutListString(): Promise<string> {
     const outList = this.#getSignedOutList();
     let stringValue = "\n*Signed Out (hope to see you next time)*\n"
     let number = 1;
 
-    for (const index in outList) {
-      const outPerson = outList[index];
-
-      stringValue += `${number}. ${outPerson.toString()}\n`;
+    for (const outPerson of outList) {
+      stringValue += `${number}. ${await outPerson.toString()}\n`;
       number += 1;
     }
 
@@ -186,15 +236,13 @@ class Session {
     return undecidedList;
   }
 
-  getUndecidedListString(): string {
+  async getUndecidedListString(): Promise<string> {
     const undecidedList = this.#getUndecidedList();
-    let stringValue = `\n*Undecided (type _in_ or _out_ to stop getting tagged)*\n`
+    let stringValue = `\n*Undecided*\n`
     let number = 1;
 
-    for (const index in undecidedList) {
-      const undecidedPerson = undecidedList[index];
-
-      stringValue += `${number}. ${undecidedPerson.toString()}\n`;
+    for (const undecidedPerson of undecidedList) {
+      stringValue += `${number}. ${await undecidedPerson.toString()}\n`;
       number += 1;
     }
 
@@ -216,15 +264,13 @@ class Session {
     return paidList;
   }
 
-  getPaidListString(): string {
+  async getPaidListString(): Promise<string> {
     const paidList = this.#getPaidList();
     let stringValue = "\n*Paid People*\n"
     let number = 1;
 
-    for (const index in paidList) {
-      const paidPerson = paidList[index];
-
-      stringValue += `${number}. ${paidPerson.toString()}\n`;
+    for (const paidPerson of paidList) {
+      stringValue += `${number}. ${await paidPerson.toString()}\n`;
       number += 1;
     }
 
@@ -245,15 +291,13 @@ class Session {
     return unpaidList;
   }
 
-  getUnpaidListString(): string {
+  async getUnpaidListString(): Promise<string> {
     const unpaidList = this.#getUnpaidList();
     let stringValue = "\n*Unpaid People*\n"
     let number = 1;
 
-    for (const index in unpaidList) {
-      const unpaidPerson = unpaidList[index];
-
-      stringValue += `${number}. ${unpaidPerson.toString()}\n`;
+    for (const unpaidPerson of unpaidList) {
+      stringValue += `${number}. ${await unpaidPerson.toString()}\n`;
       number += 1;
     }
 
@@ -266,16 +310,20 @@ class Session {
     };
   }
 
-  toString(): string {
-    let stringValue: string = `*Date* -  ${utils.convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n`;
-    stringValue += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n`;
+  #getSessionDetails(): string {
+    let sessionDetails: string = `*Date* -  ${convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n`;
+    sessionDetails += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n`;
 
-    stringValue += this.getSignedInListString();
-    stringValue += this.getSignedOutListString();
-    stringValue += this.getUndecidedListString();
+    return sessionDetails;
+  }
+
+  async toString(): Promise<string> {
+    let stringValue: string = this.#getSessionDetails();
+
+    stringValue += await this.getSignedInListString();
+    stringValue += await this.getSignedOutListString();
+    stringValue += await this.getUndecidedListString();
 
     return stringValue;
   }
 }
-
-export = Session;

@@ -1,9 +1,7 @@
-import Session = require("./session");
-import utils = require("./utils");
-import Person = require("./person");
-import SignUpEntry = require("./sign-up-entry");
+import { Session } from "./session";
+import { Person } from "./person";
 
-class Group {
+export class Group {
   #groupId: string;
   #activeSession?: Session;
 
@@ -19,8 +17,8 @@ class Group {
     }
   }
 
-  addPerson(person: Person): void {
-    this.#activeSession?.addPerson(person);
+  async addPerson(person: Person): Promise<void> {
+    await this.#activeSession?.addPerson(person);
   }
 
   removePerson(personId: string): void {
@@ -43,6 +41,14 @@ class Group {
     return this.#activeSession?.getSignUpTimeStamp(personId);
   }
 
+  async getDisplayName(personId: string): Promise<string | undefined> {
+    return this.#activeSession?.getDisplayName(personId);
+  }
+
+  getNumber(personId: string): string | undefined {
+    return this.#activeSession?.getNumber(personId);
+  }
+
   setSignUp(personId: string, isSignedIn: boolean, signUpTimeStamp: number): void {
     this.#activeSession?.setSignUp(personId, isSignedIn, signUpTimeStamp);
   }
@@ -63,23 +69,23 @@ class Group {
     return this.#activeSession?.getPaidTimeStamp(personId);
   }
 
-  getSignedInListString(): string | undefined {
+  async getSignedInListString(): Promise<string | undefined> {
     return this.#activeSession?.getSignedInListString();
   }
 
-  getSignedOutListString(): string | undefined {
+  async getSignedOutListString(): Promise<string | undefined> {
     return this.#activeSession?.getSignedOutListString();
   }
 
-  getUndecidedListString(): string | undefined {
+  async getUndecidedListString(): Promise<string | undefined> {
     return this.#activeSession?.getUndecidedListString();
   }
 
-  getPaidListString(): string | undefined {
+  async getPaidListString(): Promise<string | undefined> {
     return this.#activeSession?.getPaidListString();
   }
 
-  getUnpaidListString(): string | undefined {
+  async getUnpaidListString(): Promise<string | undefined> {
     return this.#activeSession?.getUnpaidListString();
   }
 
@@ -87,10 +93,8 @@ class Group {
     return this.#activeSession?.getMentionsList();
   }
 
-  toString(): string {
-    return `${this.#activeSession?.toString()}`;
+  async toString(): Promise<string> {
+    return this.#activeSession?.toString() || 'No sessions active right now';
   }
 
 }
-
-export = Group;

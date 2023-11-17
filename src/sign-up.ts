@@ -1,7 +1,7 @@
-import Paid = require('./paid');
-import utils = require('./utils');
+import { Paid } from './paid';
+import { isUndefined, convertTimeStampToString } from './utils';
 
-class SignUp {
+export class SignUp {
   #isSignedIn: boolean;
   #signUpTimeStamp: number;
   #paid?: Paid;
@@ -18,7 +18,7 @@ class SignUp {
   }
 
   setPaid(hasPaid: boolean, paidTimeStamp: number): void {
-    if (utils.isUndefined(this.#paid)) {
+    if (isUndefined(this.#paid)) {
       this.#paid = new Paid(hasPaid, paidTimeStamp);
     } else {
       this.#paid?.setPaid(hasPaid, paidTimeStamp);
@@ -58,11 +58,9 @@ class SignUp {
 
   toString(): string {
     if (this.#isSignedIn) {
-      return `@ ${utils.convertTimeStampToString(this.#signUpTimeStamp)}\n[${this.#paid}]`;
+      return `@ ${convertTimeStampToString(this.#signUpTimeStamp)}\n[${this.#paid?.toString()}]`;
     } else {
-      return `@ ${utils.convertTimeStampToString(this.#signUpTimeStamp)}`;
+      return `@ ${convertTimeStampToString(this.#signUpTimeStamp)}`;
     }
   }
 }
-
-export = SignUp;

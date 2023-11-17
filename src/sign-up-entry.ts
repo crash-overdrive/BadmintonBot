@@ -1,8 +1,8 @@
-import Person = require('./person');
-import SignUp = require('./sign-up');
-import utils = require('./utils');
+import { Person } from './person';
+import { SignUp } from './sign-up';
+import { isUndefined } from './utils';
 
-class SignUpEntry {
+export class SignUpEntry {
   #person: Person;
   #signUp?: SignUp;
 
@@ -22,8 +22,16 @@ class SignUpEntry {
     return this.#person.isGuestMember();
   }
 
+  getNumber(): string {
+    return this.#person.getNumber();
+  }
+
+  async getDisplayName(): Promise<string | undefined> {
+    return this.#person.getDisplayName();
+  }
+
   hasSignedUp(): boolean {
-    return !utils.isUndefined(this.#signUp);
+    return !isUndefined(this.#signUp);
   }
 
   isSignedIn(): boolean | undefined {
@@ -35,7 +43,7 @@ class SignUpEntry {
   }
 
   setSignUp(isSignedIn: boolean, signUpTimeStamp: number): void {
-    if (utils.isUndefined(this.#signUp)) {
+    if (isUndefined(this.#signUp)) {
       this.#signUp = new SignUp(isSignedIn, signUpTimeStamp*1000);
     } else if (this.#signUp?.isSignedIn() !== isSignedIn) {
       this.#signUp?.setSignUp(isSignedIn, signUpTimeStamp*1000);
@@ -58,13 +66,11 @@ class SignUpEntry {
     return this.#signUp?.getPaidTimeStamp();
   }
 
-  toString(): string {
-    if (utils.isUndefined(this.#signUp)) {
-      return `${this.#person.toString()}`
+  async toString(): Promise<string> {
+    if (isUndefined(this.#signUp)) {
+      return `${await this.#person.toString()}`
     } else {
-      return `${this.#person.toString()} ${this.#signUp?.toString()}`
+      return `${await this.#person.toString()} ${this.#signUp?.toString()}`
     }
   }
 }
-
-export = SignUpEntry;

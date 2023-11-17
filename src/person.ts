@@ -1,6 +1,7 @@
-import utils = require('./utils');
+import { isUndefined } from './utils';
+import { getDisplayNameByContactId } from './wws-service';
 
-class Person {
+export class Person {
   #id: string;
   #number: string;
   #isGuest: boolean;
@@ -17,6 +18,17 @@ class Person {
     return this.#id;
   }
 
+  getNumber(): string {
+    return this.#number;
+  }
+
+  async getDisplayName(): Promise<string | undefined> {
+    if (isUndefined(this.#displayName)) {
+      this.#displayName = await getDisplayNameByContactId(this.#id);
+    } 
+    return this.#displayName;
+  }
+
   isGuestMember(): boolean {
     return this.#isGuest;
   }
@@ -25,16 +37,11 @@ class Person {
     return this.#id === otherPerson.getId();
   }
 
-  toString(): string {
+  async toString(): Promise<string> {
     if (this.#isGuest) {
       return this.#id; // TODO: confirm what this should be
-    } else if (utils.isUndefined(this.#displayName)) {
-      // TODO: this should be tried to be updated before returning number
-      return `@${this.#number}`;
     } else {
-      return this.#displayName as string;
+      return await this.getDisplayName() || `@${this.#number}`;
     }
   }
 }
-
-export = Person;
