@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./built",
     "allowJs": false,
-    "target": "ES2021",
+    "target": "ES2022",
     "noEmitOnError": true,
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
@@ -10,7 +10,7 @@
     "moduleResolution": "Node",
     "strictPropertyInitialization": true,
     "strictNullChecks": true,
-    "module": "CommonJS",
+    "module": "ES2022",
 
     "skipLibCheck": true,
     // "allowSyntheticDefaultImports": true,
