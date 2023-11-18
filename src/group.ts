@@ -89,6 +89,10 @@ export class Group {
     return this.#activeSession?.getUnpaidListString();
   }
 
+  async notifyUndecidedMembers(): Promise<void> {
+    await this.#activeSession?.notifyUndecidedMembers();
+  }
+
   getMentionsList(): {[mentions: string] : string[]} | undefined {
     return this.#activeSession?.getMentionsList();
   }

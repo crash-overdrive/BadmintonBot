@@ -1,5 +1,5 @@
 import { Message, GroupNotification } from 'whatsapp-web.js';
-import { Member, getAffectedMembersContactIdFromGroupNotification, getAuthorFromMessage, getBodyFromMessage, getChatIdFromGroupNotification, getChatIdFromMessage, getMemberFromGroupNotification, getMentionIdsFromMessage, getSelfId, getTimeStampFromMessage } from './wws-service';
+import { Member, getAffectedMembersContactIdFromGroupNotification, getAuthorFromMessage, getBodyFromMessage, getChatIdFromGroupNotification, getChatIdFromMessage, getMemberFromGroupNotification, getMentionIdsFromMessage, getSelfId, getTimeStampFromMessage, sendMessage } from './wws-service';
 import { constants } from './constants';
 import { Groups } from './groups';
 import { Person } from './person';
@@ -143,6 +143,16 @@ const handleIfValidUnpaidListMessageByAdmin = (message: Message): void => {
   }
 }
 
+const handleIfValidNotifyUndecidedMessageByAdmin = async (message: Message): Promise<void> => {
+  const messageBody: string = getBodyFromMessage(message);
+  const author: string = getAuthorFromMessage(message);
+  const groupId: string = getChatIdFromMessage(message);
+
+  if (isBotEnrolledInGroup(groupId) && messageBody.startsWith(constants.COMMANDS.ADMIN.NOTIFY_UNDECIDED) && author === constants.ID.OWNER) {
+    await groups.notifyUndecidedMembers(groupId);
+  }
+}
+
 // user level messages
 const handleIfValidInMessage = (message: Message): void => {
   const messageBody: string = getBodyFromMessage(message);
@@ -197,7 +207,7 @@ const handleIfValidListMessage = async (message: Message): Promise<void> => {
   const groupId: string = getChatIdFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && messageBody === constants.COMMANDS.USER.LIST) {
-    await message.reply(await groups.getGroup(groupId).toString(), groupId, groups.getGroup(groupId).getMentionsList());
+    await sendMessage(getAuthorFromMessage(message), await groups.getGroup(groupId).toString(), groups.getGroup(groupId).getMentionsList());
   }
 }
 
@@ -220,6 +230,7 @@ export const handleMessage = async (message: Message): Promise<void> => {
     handleIfValidUndecidedListMessageByAdmin(message);
     handleIfValidPaidListMessageByAdmin(message);
     handleIfValidUnpaidListMessageByAdmin(message);
+    await handleIfValidNotifyUndecidedMessageByAdmin(message);
     // user wide level messages
     handleIfValidInMessage(message);
     handleIfValidOutMessage(message);

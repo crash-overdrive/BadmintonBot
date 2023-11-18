@@ -95,6 +95,10 @@ export class Groups {
   async getUnpaidListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getUnpaidListString();
   }
+  
+  async notifyUndecidedMembers(groupId: string): Promise<void> {
+    await this.#groups[groupId].notifyUndecidedMembers();
+  }
 
   getMentionsList(groupId: string): {[mentions: string] : string[]} | undefined {
     return this.#groups[groupId].getMentionsList();

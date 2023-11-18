@@ -61,6 +61,13 @@ export class Session {
 
   async notifyUndecidedMembers(): Promise<void> {
     // get unsigned member check for guest and send them message, check for display name as well
+    const undecidedList = this.#getUndecidedList();
+
+    for (const undecidedMember of undecidedList) {
+      if (!undecidedMember.isGuestMember()) {
+        await sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()), this.getMentionsList());
+      }
+    }
 
     // const job = new CronJob(
     //   '* * * * * *', // cronTime
@@ -84,15 +91,27 @@ export class Session {
     signUpOpenMessage += this.#getSessionDetails();
 
     if (isUndefined(displayName)) {
-      signUpOpenMessage += `I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
+      signUpOpenMessage += `*IMPORTANT*: I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
     }
 
     return signUpOpenMessage;
   }
 
-  // #getUndecidedMessage(member: Person): string {
-    
-  // }
+  async #getUndecidedMessage(member: Person): Promise<string> {
+    const displayName = await member.getDisplayName();
+    const chatName = await getChatNameFromChatId(this.#groupId);
+    let undecidedMessage = `Hi ${displayName || member.getNumber()}\n\n`;
+    undecidedMessage += `You are getting this message because Sign Ups are open in the group *${chatName}* and you haven't indicated your availability\n\n`;
+    undecidedMessage += `Please make sure to type *"in"* or *"out"* in the group to stop getting this message\n\n`;
+    undecidedMessage += `Session details are as follows\n\n`;
+    undecidedMessage += this.#getSessionDetails();
+
+    if (isUndefined(displayName)) {
+      undecidedMessage += `*IMPORTANT*: I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
+    }
+
+    return undecidedMessage;
+  }
 
   modifySessionDetails(groupId: string, date: number, startTime: string, endTime: string, numCourts: number) {
     this.#groupId = groupId;
