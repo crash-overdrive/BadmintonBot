@@ -1,11 +1,11 @@
 import { getClient } from "./wws-service";
 import { handleGroupJoin, handleGroupLeave, handleMessage } from "./interactions";
-import { generate } from 'qrcode-terminal';
+import * as qrcode from 'qrcode-terminal';
 
 const client = getClient();
 
 client.on('qr', qr => {
-  generate(qr, {small: true});
+  qrcode.generate(qr, {small: true});
 });
 
 client.on('ready', () => {

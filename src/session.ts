@@ -55,7 +55,8 @@ export class Session {
 
   async #notifySignUpOpen(person: Person): Promise<void> {
     if (!person.isGuestMember()) {
-      await sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
     }
   }
 
@@ -65,7 +66,8 @@ export class Session {
 
     for (const undecidedMember of undecidedList) {
       if (!undecidedMember.isGuestMember()) {
-        await sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()));
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()));
       }
     }
 

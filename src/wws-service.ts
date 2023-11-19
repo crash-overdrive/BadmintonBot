@@ -5,7 +5,7 @@ import Bottleneck from "bottleneck";
 let client: Client;
 const rateLimiter = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 10000
+  minTime: 2000
 });
 
 const getContactIdFromParticipant = (participant: GroupParticipant): string => {
