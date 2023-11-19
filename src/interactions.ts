@@ -207,7 +207,7 @@ const handleIfValidListMessage = async (message: Message): Promise<void> => {
   const groupId: string = getChatIdFromMessage(message);
 
   if (isBotEnrolledInGroup(groupId) && messageBody === constants.COMMANDS.USER.LIST) {
-    await sendMessage(getAuthorFromMessage(message), await groups.getGroup(groupId).toString(), groups.getGroup(groupId).getMentionsList());
+    await sendMessage(getAuthorFromMessage(message), await groups.getGroup(groupId).toString());
   }
 }
 

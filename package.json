@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bottleneck": "^2.19.5",
     "cron": "^3.1.6",
     "nodemon": "^3.0.1",
     "qrcode-terminal": "^0.12.0",

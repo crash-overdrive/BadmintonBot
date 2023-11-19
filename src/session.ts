@@ -52,7 +52,7 @@ export class Session {
     this.#signUps[person.getId()] = new SignUpEntry(person);
     await this.#notifySignUpOpen(person);
   }
-  
+
   async #notifySignUpOpen(person: Person): Promise<void> {
     if (!person.isGuestMember()) {
       await sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
@@ -65,7 +65,7 @@ export class Session {
 
     for (const undecidedMember of undecidedList) {
       if (!undecidedMember.isGuestMember()) {
-        await sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()), this.getMentionsList());
+        await sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()));
       }
     }
 

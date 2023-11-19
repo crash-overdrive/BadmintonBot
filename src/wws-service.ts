@@ -1,7 +1,12 @@
 import { Client, GroupChat, GroupParticipant, Contact, Message, MessageContent, MessageSendOptions, GroupNotification, LocalAuth } from 'whatsapp-web.js';
 import { isUndefined } from './utils';
+import Bottleneck from "bottleneck";
 
 let client: Client;
+const rateLimiter = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 10000
+});
 
 const getContactIdFromParticipant = (participant: GroupParticipant): string => {
   return participant.id._serialized;
@@ -23,6 +28,10 @@ const getContactByContactId = async (contactId: string): Promise<Contact> => {
 
 const getDisplayNameFromContact = (contact: Contact): string => {
   return contact.pushname;
+}
+
+const sendMessageUnthrottled = async(chatId: string, content: MessageContent, options?: MessageSendOptions): Promise<Message> => {
+  return await getClient().sendMessage(chatId, content, options);
 }
 
 export type Member = {
@@ -116,6 +125,4 @@ export const getSelfId = () : string => {
   return getClient().info.wid._serialized;
 }
 
-export const sendMessage = async(chatId: string, content: MessageContent, options?: MessageSendOptions): Promise<Message> => {
-  return await getClient().sendMessage(chatId, content, options);
-}
+export const sendMessage = rateLimiter.wrap(sendMessageUnthrottled);
