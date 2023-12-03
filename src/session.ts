@@ -1,7 +1,7 @@
 
 import { Person } from "./person";
 import { SignUpEntry } from "./sign-up-entry";
-import { Member, getSelfId, getMembersFromGroupChat, getChatNameFromChatId } from "./wws-service";
+import { Member, getSelfId, getMembersFromGroupChat, getChatNameFromChatId, sendMessage } from "./wws-service";
 import { convertTimeStampToDate } from "./utils";
 
 function compareTimeStampsForSignUp(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
@@ -20,6 +20,7 @@ export class Session {
   #numCourts: number;
   #maxSignIns: number;
   #signUps: {[personId: string]: SignUpEntry};
+  #subscribedGroups: string[];
 
   constructor(groupId: string, date: number, startTime: string, endTime: string, numCourts: number) {
     this.#groupId = groupId;
@@ -29,6 +30,18 @@ export class Session {
     this.#numCourts = numCourts;
     this.#maxSignIns = (this.#numCourts) * 6;
     this.#signUps = {};
+    this.#subscribedGroups = [
+      "120363045631714319@g.us", // General Chat
+      "120363173483109408@g.us", // Kings Court
+      "120363200803611334@g.us", // Sign Up - Monday
+      "120363170998460965@g.us", // Sign Up - Wednesday
+      "120363186715359663@g.us", // Sign Up - Friday
+      "120363173973697808@g.us", // Kings Court
+
+      // '120363151328519970@g.us', // Badminton Sign Up test
+      // '120363202510083519@g.us', // Test Community
+      // '120363185433062869@g.us' // Test Community
+    ];
 
     this.#initSignUps().then(
       () => {},
@@ -46,59 +59,33 @@ export class Session {
         this.#addSignUpEntry(person);
       }
     }
+
+    await this.#notifySignUpOpenInGroups();
   }
 
   #addSignUpEntry(person: Person) {
     this.#signUps[person.getId()] = new SignUpEntry(person);
-    // await this.#notifySignUpOpen(person);
   }
 
-  // async #notifySignUpOpen(person: Person): Promise<void> {
-  //   if (!person.isGuestMember()) {
-  //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  //     sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
-  //   }
-  // }
+  async #notifySignUpOpenInGroups(): Promise<void> {
+    for (const groupId of this.#subscribedGroups) {
+      await this.#sendSignUpOpenMessageInGroup(groupId);
+    }
+  }
 
-  // async notifyUndecidedMembers(): Promise<void> {
-  //   // get unsigned member check for guest and send them message, check for display name as well
-  //   const undecidedList = this.#getUndecidedList();
-
-  //   for (const undecidedMember of undecidedList) {
-  //     if (!undecidedMember.isGuestMember()) {
-  //       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  //       sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()));
-  //     }
-  //   }
-  // }
-
-  async #getSignUpOpenMessage(): Promise<string> {
+  async #sendSignUpOpenMessageInGroup(groupId: string): Promise<void> {
     // check for display name
     const chatName = await getChatNameFromChatId(this.#groupId);
-    let signUpOpenMessage = `Hi \n\n`;
-    signUpOpenMessage += `Sign ups are now open in the group *${chatName}*\n\n`;
+    let signUpOpenMessage = `Hi Everyone\n\n`;
+    signUpOpenMessage += `Sign ups are now open in the group @${this.#groupId}\n\n`;
     signUpOpenMessage += `Please make sure to type *"in"* or *"out"* in the group to indicate your availability\n\n`;
     signUpOpenMessage += `Session details are as follows\n\n`;
     signUpOpenMessage += this.#getSessionDetails();
 
-    return signUpOpenMessage;
+    await sendMessage(groupId, signUpOpenMessage, {
+      groupMentions: [{ subject: chatName, id: this.#groupId }]
+    });
   }
-
-  // async #getUndecidedMessage(member: Person): Promise<string> {
-  //   const displayName = await member.getDisplayName();
-  //   const chatName = await getChatNameFromChatId(this.#groupId);
-  //   let undecidedMessage = `Hi ${displayName || member.getNumber()}\n\n`;
-  //   undecidedMessage += `You are getting this message because Sign Ups are open in the group *${chatName}* and you haven't indicated your availability\n\n`;
-  //   undecidedMessage += `Please make sure to type *"in"* or *"out"* in the group to stop getting this message\n\n`;
-  //   undecidedMessage += `Session details are as follows\n\n`;
-  //   undecidedMessage += this.#getSessionDetails();
-
-  //   if (isUndefined(displayName)) {
-  //     undecidedMessage += `*IMPORTANT*: I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
-  //   }
-
-  //   return undecidedMessage;
-  // }
 
   modifySessionDetails(groupId: string, date: number, startTime: string, endTime: string, numCourts: number) {
     this.#groupId = groupId;
