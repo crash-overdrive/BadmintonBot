@@ -17,8 +17,8 @@ export class Group {
     }
   }
 
-  async addPerson(person: Person): Promise<void> {
-    await this.#activeSession?.addPerson(person);
+  addPerson(person: Person): void {
+    this.#activeSession?.addPerson(person);
   }
 
   removePerson(personId: string): void {
@@ -89,9 +89,9 @@ export class Group {
     return this.#activeSession?.getUnpaidListString();
   }
 
-  async notifyUndecidedMembers(): Promise<void> {
-    await this.#activeSession?.notifyUndecidedMembers();
-  }
+  // async notifyUndecidedMembers(): Promise<void> {
+  //   await this.#activeSession?.notifyUndecidedMembers();
+  // }
 
   getMentionsList(): {[mentions: string] : string[]} | undefined {
     return this.#activeSession?.getMentionsList();

@@ -143,15 +143,15 @@ const handleIfValidUnpaidListMessageByAdmin = (message: Message): void => {
   }
 }
 
-const handleIfValidNotifyUndecidedMessageByAdmin = async (message: Message): Promise<void> => {
-  const messageBody: string = getBodyFromMessage(message);
-  const author: string = getAuthorFromMessage(message);
-  const groupId: string = getChatIdFromMessage(message);
+// const handleIfValidNotifyUndecidedMessageByAdmin = async (message: Message): Promise<void> => {
+//   const messageBody: string = getBodyFromMessage(message);
+//   const author: string = getAuthorFromMessage(message);
+//   const groupId: string = getChatIdFromMessage(message);
 
-  if (isBotEnrolledInGroup(groupId) && messageBody.startsWith(constants.COMMANDS.ADMIN.NOTIFY_UNDECIDED) && author === constants.ID.OWNER) {
-    await groups.notifyUndecidedMembers(groupId);
-  }
-}
+//   if (isBotEnrolledInGroup(groupId) && messageBody.startsWith(constants.COMMANDS.ADMIN.NOTIFY_UNDECIDED) && author === constants.ID.OWNER) {
+//     await groups.notifyUndecidedMembers(groupId);
+//   }
+// }
 
 // user level messages
 const handleIfValidInMessage = (message: Message): void => {
@@ -231,7 +231,8 @@ export const handleMessage = async (message: Message): Promise<void> => {
     handleIfValidUndecidedListMessageByAdmin(message);
     handleIfValidPaidListMessageByAdmin(message);
     handleIfValidUnpaidListMessageByAdmin(message);
-    await handleIfValidNotifyUndecidedMessageByAdmin(message);
+    // await handleIfValidNotifyUndecidedMessageByAdmin(message);
+
     // user wide level messages
     handleIfValidInMessage(message);
     handleIfValidOutMessage(message);
@@ -250,7 +251,7 @@ export const handleGroupJoin = async (notification: GroupNotification): Promise<
     const member: Member = await getMemberFromGroupNotification(notification);
 
     if (isBotEnrolledInGroup(groupId)) {
-      await groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
+      groups.addPerson(groupId, new Person(member.id, member.number, member.displayName, false));
     }
   } catch(error: unknown) {
     console.log(error);

@@ -4,7 +4,7 @@
     "cron": "^3.1.6",
     "nodemon": "^3.0.1",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.23.0"
+    "whatsapp-web.js": "github:alechkos/whatsapp-web.js#group-mentions"
   },
   "devDependencies": {
     "@types/qrcode-terminal": "^0.12.1",
@@ -12,5 +12,9 @@
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.53.0",
     "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "lint": "npx eslint .",
+    "start": "npx ts-node src/index.ts"
   }
 }

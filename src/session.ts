@@ -1,8 +1,8 @@
 
 import { Person } from "./person";
 import { SignUpEntry } from "./sign-up-entry";
-import { Member, sendMessage, getSelfId, getMembersFromGroupChat, getChatNameFromChatId } from "./wws-service";
-import { convertTimeStampToDate, isUndefined } from "./utils";
+import { Member, getSelfId, getMembersFromGroupChat, getChatNameFromChatId } from "./wws-service";
+import { convertTimeStampToDate } from "./utils";
 
 function compareTimeStampsForSignUp(signUpEntryA: SignUpEntry, signUpEntryB: SignUpEntry): number {
   return (signUpEntryA.getSignUpTimeStamp()! - signUpEntryB.getSignUpTimeStamp()!);
@@ -43,77 +43,62 @@ export class Session {
       if (member.id !== getSelfId()) {
         const person = new Person(member.id, member.number, member.displayName, false);
 
-        await this.#addSignUpEntry(person);
+        this.#addSignUpEntry(person);
       }
     }
   }
 
-  async #addSignUpEntry(person: Person) {
+  #addSignUpEntry(person: Person) {
     this.#signUps[person.getId()] = new SignUpEntry(person);
-    await this.#notifySignUpOpen(person);
+    // await this.#notifySignUpOpen(person);
   }
 
-  async #notifySignUpOpen(person: Person): Promise<void> {
-    if (!person.isGuestMember()) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
-    }
-  }
+  // async #notifySignUpOpen(person: Person): Promise<void> {
+  //   if (!person.isGuestMember()) {
+  //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  //     sendMessage(person.getId(), await this.#getSignUpOpenMessage(person));
+  //   }
+  // }
 
-  async notifyUndecidedMembers(): Promise<void> {
-    // get unsigned member check for guest and send them message, check for display name as well
-    const undecidedList = this.#getUndecidedList();
+  // async notifyUndecidedMembers(): Promise<void> {
+  //   // get unsigned member check for guest and send them message, check for display name as well
+  //   const undecidedList = this.#getUndecidedList();
 
-    for (const undecidedMember of undecidedList) {
-      if (!undecidedMember.isGuestMember()) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()));
-      }
-    }
+  //   for (const undecidedMember of undecidedList) {
+  //     if (!undecidedMember.isGuestMember()) {
+  //       // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  //       sendMessage(undecidedMember.getPersonId(), await this.#getUndecidedMessage(undecidedMember.getPerson()));
+  //     }
+  //   }
+  // }
 
-    // const job = new CronJob(
-    //   '* * * * * *', // cronTime
-    //   function () {
-    //     console.log('You will see this message every second');
-    //   }, // onTick
-    //   null, // onComplete
-    //   true, // start
-    //   'America/Toronto' // timeZone
-    // );
-  }
-
-  async #getSignUpOpenMessage(member: Person): Promise<string> {
+  async #getSignUpOpenMessage(): Promise<string> {
     // check for display name
-    const displayName = await member.getDisplayName();
     const chatName = await getChatNameFromChatId(this.#groupId);
-    let signUpOpenMessage = `Hi ${displayName || member.getNumber()}\n\n`;
+    let signUpOpenMessage = `Hi \n\n`;
     signUpOpenMessage += `Sign ups are now open in the group *${chatName}*\n\n`;
     signUpOpenMessage += `Please make sure to type *"in"* or *"out"* in the group to indicate your availability\n\n`;
     signUpOpenMessage += `Session details are as follows\n\n`;
     signUpOpenMessage += this.#getSessionDetails();
 
-    if (isUndefined(displayName)) {
-      signUpOpenMessage += `*IMPORTANT*: I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
-    }
-
     return signUpOpenMessage;
   }
 
-  async #getUndecidedMessage(member: Person): Promise<string> {
-    const displayName = await member.getDisplayName();
-    const chatName = await getChatNameFromChatId(this.#groupId);
-    let undecidedMessage = `Hi ${displayName || member.getNumber()}\n\n`;
-    undecidedMessage += `You are getting this message because Sign Ups are open in the group *${chatName}* and you haven't indicated your availability\n\n`;
-    undecidedMessage += `Please make sure to type *"in"* or *"out"* in the group to stop getting this message\n\n`;
-    undecidedMessage += `Session details are as follows\n\n`;
-    undecidedMessage += this.#getSessionDetails();
+  // async #getUndecidedMessage(member: Person): Promise<string> {
+  //   const displayName = await member.getDisplayName();
+  //   const chatName = await getChatNameFromChatId(this.#groupId);
+  //   let undecidedMessage = `Hi ${displayName || member.getNumber()}\n\n`;
+  //   undecidedMessage += `You are getting this message because Sign Ups are open in the group *${chatName}* and you haven't indicated your availability\n\n`;
+  //   undecidedMessage += `Please make sure to type *"in"* or *"out"* in the group to stop getting this message\n\n`;
+  //   undecidedMessage += `Session details are as follows\n\n`;
+  //   undecidedMessage += this.#getSessionDetails();
 
-    if (isUndefined(displayName)) {
-      undecidedMessage += `*IMPORTANT*: I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
-    }
+  //   if (isUndefined(displayName)) {
+  //     undecidedMessage += `*IMPORTANT*: I can't get your name from your profile, please type something in our personal chat or in the group to let me get your name from the profile`;
+  //   }
 
-    return undecidedMessage;
-  }
+  //   return undecidedMessage;
+  // }
 
   modifySessionDetails(groupId: string, date: number, startTime: string, endTime: string, numCourts: number) {
     this.#groupId = groupId;
@@ -127,8 +112,8 @@ export class Session {
     return this.#date;
   }
 
-  async addPerson(person: Person): Promise<void> {
-    await this.#addSignUpEntry(person);
+  addPerson(person: Person): void {
+    this.#addSignUpEntry(person);
   }
 
   removePerson(personId: string): void {
@@ -348,3 +333,13 @@ export class Session {
     return stringValue;
   }
 }
+
+// const job = new CronJob(
+//   '* * * * * *', // cronTime
+//   function () {
+//     console.log('You will see this message every second');
+//   }, // onTick
+//   null, // onComplete
+//   true, // start
+//   'America/Toronto' // timeZone
+// );
