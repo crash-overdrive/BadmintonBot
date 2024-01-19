@@ -304,11 +304,11 @@ export class Session {
   }
 
   getSessionDetails(): string {
-    let sessionDetails: string = `*Date* -  ${convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n\n\n`;
-    sessionDetails += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n\n\n`;
-    sessionDetails += `Sign up closes 6 hours before session starts.\n`;
-    sessionDetails += `If sign ups are closed and you still want to come to the session then please contact host directly.\n\n\n`
-    sessionDetails += `*If you are signed up and can't make it to the session then please sign out 12 hours in advance. If there is less than 12 hours left before session starts then please find a replacement for yourself or pay the session fee.`
+    let sessionDetails: string = `*Date* -  ${convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n\n`;
+    sessionDetails += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n\n`;
+    sessionDetails += `Sign up closes 6 hours before session starts.`;
+    sessionDetails += `If sign ups are closed and you still want to come to the session then please contact host directly.\n\n`
+    sessionDetails += `If you are signed up and can't make it to the session then please sign out 12 hours in advance. If there is less than 12 hours left before session starts then please find a replacement for yourself or pay the session fee.\n\n`
 
     return sessionDetails;
   }
