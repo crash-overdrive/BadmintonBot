@@ -202,6 +202,15 @@ const handleIfValidUnpaidMessage = (message: Message): void => {
   }
 }
 
+const handleIfValidTimeMessage = async (message: Message): Promise<void> => {
+  const messageBody: string = getBodyFromMessage(message);
+  const groupId: string = getChatIdFromMessage(message);
+
+  if (isBotEnrolledInGroup(groupId) && messageBody === constants.COMMANDS.USER.TIME) {
+    await message.reply(groups.getSessionDetails(groupId) || "Session sign up hasn't open yet");
+  }
+}
+
 const handleIfValidListMessage = async (message: Message): Promise<void> => {
   const messageBody: string = getBodyFromMessage(message);
   const groupId: string = getChatIdFromMessage(message);
@@ -238,6 +247,7 @@ export const handleMessage = async (message: Message): Promise<void> => {
     handleIfValidOutMessage(message);
     handleIfValidPaidMessage(message);
     handleIfValidUnpaidMessage(message);
+    await handleIfValidTimeMessage(message);
     await handleIfValidListMessage(message);
 
   } catch(error: unknown) {

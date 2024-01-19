@@ -76,6 +76,10 @@ export class Groups {
     return this.#groups[groupId].getPaidTimeStamp(personId);
   }
 
+  getSessionDetails(groupId: string): string | undefined {
+    return this.#groups[groupId].getSessionDetails();
+  }
+
   async getSignedInListString(groupId: string): Promise<string | undefined> {
     return this.#groups[groupId].getSignedInListString();
   }

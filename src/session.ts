@@ -80,7 +80,7 @@ export class Session {
     signUpOpenMessage += `Sign ups are now open in the group @${this.#groupId}\n\n`;
     signUpOpenMessage += `Please make sure to type *"in"* or *"out"* in the group to indicate your availability\n\n`;
     signUpOpenMessage += `Session details are as follows\n\n`;
-    signUpOpenMessage += this.#getSessionDetails();
+    signUpOpenMessage += this.getSessionDetails();
 
     await sendMessage(groupId, signUpOpenMessage, {
       groupMentions: [{ subject: chatName, id: this.#groupId }]
@@ -303,15 +303,18 @@ export class Session {
     };
   }
 
-  #getSessionDetails(): string {
-    let sessionDetails: string = `*Date* -  ${convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n`;
-    sessionDetails += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n`;
+  getSessionDetails(): string {
+    let sessionDetails: string = `*Date* -  ${convertTimeStampToDate(this.#date).toDateString()}\n*Time* - ${this.#startTime}-${this.#endTime}PM\n*Courts* - ${this.#numCourts}\n\n\n`;
+    sessionDetails += `Maximum number of sign ups allowed: ${this.#maxSignIns}\n\n\n`;
+    sessionDetails += `Sign up closes 6 hours before session starts.\n`;
+    sessionDetails += `If sign ups are closed and you still want to come to the session then please contact host directly.\n\n\n`
+    sessionDetails += `*If you are signed up and can't make it to the session then please sign out 12 hours in advance. If there is less than 12 hours left before session starts then please find a replacement for yourself or pay the session fee.`
 
     return sessionDetails;
   }
 
   async toString(): Promise<string> {
-    let stringValue: string = this.#getSessionDetails();
+    let stringValue: string = this.getSessionDetails();
 
     stringValue += await this.getSignedInListString();
     stringValue += await this.getSignedOutListString();

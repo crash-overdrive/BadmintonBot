@@ -21,6 +21,7 @@ export const constants = {
       PAID: "paid".toLowerCase(),
       UNPAID: "unpaid".toLowerCase(),
       LIST: "list".toLowerCase(),
+      TIME: "time".toLowerCase(),
     }
   },
   ID: {

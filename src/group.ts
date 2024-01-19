@@ -97,6 +97,10 @@ export class Group {
     return this.#activeSession?.getMentionsList();
   }
 
+  getSessionDetails(): string | undefined {
+    return this.#activeSession?.getSessionDetails();
+  }
+
   async toString(): Promise<string> {
     return this.#activeSession?.toString() || 'No sessions active right now';
   }
